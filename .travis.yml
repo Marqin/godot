@@ -41,12 +41,25 @@ matrix:
     - compiler: clang
       env: GODOT_TARGET=x11
 
+  include:
+    - os: linux
+      compiler: clang
+      env: ANALYZE=true
+   # - os: osx
+   #   compiler: clang
+   #   env: ANALYZE=true
 
 before_script:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update -qq; sudo apt-get install -y scons pkg-config libx11-dev libxcursor-dev build-essential libasound2-dev libfreetype6-dev libgl1-mesa-dev libglu-dev libssl-dev libxinerama-dev libudev-dev; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$GODOT_TARGET" = "windows" ]; then sudo apt-get update -qq; sudo apt-get install -y mingw32 mingw-w64; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; brew install scons; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$GODOT_TARGET" = "android" ]; then brew update; brew install android-sdk android-ndk; export ANDROID_HOME=/usr/local/opt/android-sdk; export ANDROID_NDK_ROOT=/usr/local/opt/android-ndk; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$ANALYZE" = "true" ]; then sudo apt-get update -qq; sudo apt-get install -qq clang-3.5; fi
+  # OS X check disabled for free Travis CI. Uncomment if you use paid one.
+  #- if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$ANALYZE" = "true" ]; then brew update; brew install -v llvm37; fi
 
 script:
-  - scons platform=$GODOT_TARGET CXX=$CXX
+  - if [ "$ANALYZE" != "true" ]; then scons platform=$GODOT_TARGET CXX=$CXX; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$ANALYZE" = "true" ]; then scan-build-3.5 scons platform=x11 tools=no CXX=/usr/share/clang/scan-build-3.5/c++-analyzer; fi
+  # Beware, this is timeouting on free Travis CI. Uncomment if you use paid one.
+  #- if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$ANALYZE" = "true" ]; then scan-build-3.7 scons platform=osx tools=no CXX="$(dirname $(which scan-build-3.7))/"$(dirname $(readlink $(which scan-build-3.7)))"/../share/clang-3.7/tools/scan-build/c++-analyzer"; fi
