@@ -4,41 +4,14 @@ sudo: false
 
 compiler:
   - gcc
-  - clang
 
 os:
   - linux
-  - osx
 
 env:
-  - GODOT_TARGET=iphone
-  - GODOT_TARGET=osx
-  - GODOT_TARGET=x11
-  - GODOT_TARGET=android
-  - GODOT_TARGET=windows
-
-matrix:
-  exclude:
-    - os: linux
-      env: GODOT_TARGET=iphone
-    - os: linux
-      env: GODOT_TARGET=osx
-    - os: linux
-      env: GODOT_TARGET=android
-    - os: osx
-      env: GODOT_TARGET=x11
-    - os: osx
-      env: GODOT_TARGET=windows
-    - compiler: gcc
-      env: GODOT_TARGET=iphone
-    - compiler: gcc
-      env: GODOT_TARGET=osx
-    - compiler: clang
-      env: GODOT_TARGET=android
-    - compiler: clang
-      env: GODOT_TARGET=windows
-    - compiler: clang
-      env: GODOT_TARGET=x11
+  global:
+    - secure: "0S91nn9WWYQH7yhyqyCNgdKbkA8wJY2VEszLYfmVhn82/gJvWR94iY0h5S7qctyJWU2C4ygGinQN6chnc8j2EPbPhmBWlU7/OIWiE5QimxysaRJdZ/rOoqECCQ+gLt4EeFDOVOeMUirOtaRsmFLg/GcSjJoeAxK2gaHvC904redoCohZjXHBj/UwSqhylYZhIwxzxSTrhHMsrY4te+1RdOAwNucCs99ZcdCgKCaO2llrfrvvHoTREk8eqxW+fYIJ731Sl2aYFRLi3zu3QQnkPLKjMMAM4Pa3sGK0/jnuigx72WARE18M1WnVesvOR26hnkBg+4TenZPk8VRelCIx4ZYZYlXoSzqegZZyMnt6t2f5wE5MxhlXSneM+Qg5iN76R98qMBm8C3TQbHfb/4xkzGbKX2TQJ+WBPHZqksDB6wKNubvDkcdKWFJQscnngPMZ9+LT3To5KwFI4U4DEGzHKvc6ViiOMCMe3obH+MMDxlox99pNta80XvRNvWvaPDIC8cN6RTkwR8+frDm3mWBFNYemBprXhksfARkZX48cI3rU3xtDyGI4wfu+9RfOtELsd5/HXWz0AtRHvIX8obe3F4iI4zh+gZeJUlKgaH6pt9WCqiOuVuj3YvH0DtQypzgtjlqoqybXNSIgyHOhzjhcS+GpIP6qyJnIMHfZ7/IhxUs="
+    - secure: "L+qvZPBCsRs/ev4Aa35YosCl3ds/jFereVLLxSEUj4w6edaeOBKwEbwLiGy8JrYFXY6Q4fwjpH+gTbHXBGqP6lgNOYK84Ug6YnhPSnh/Xwtnlx+BKhBh0Go++z5r+3gAmPBoJxuzTZ2IzW29BgucxdK8Aee+/MMh+V2cd35ouOGS90fJP2yO2iDnqn5N2hfwkfA403WZ3WZVciQkTuSI32Uruj30YyhnY4ZfRXLI0x0GNvLd+2DLPgdhiMRs7jK+ITwqNt5Eg4CIQEDSeZ3gaKdqPtx1ioqs9Yr1vrdAYebc97W6jQ0QCMbmBxUoDTW6A4BpKQkr4EjbZlRkYdfHbxiiIbsgxqmxfvfvkkmUTSCCdtq51UZLvuixAEkLPgDDaQ0aRNeTSAie9viArAWtL9eH/RyqZG8We4epZEhXvRUZvEx0zfuPvza5RLR2V3B/9y2OxpVzSIaXhEnPRPij97MNIZrZ9h/GWOl9iO0yJMyLsMqv6dmkMKyThC3b0Ix+TTEpCjo2rPnpg44kCLSiaGd3ut0b/Z4wydl9MS89NrSluVoU61a/lZl19GHAGVOJ797RC03caK9zDq9dgGwBAu94G42svjdZd8D0ZueCMdyvDh/Mt4w71bQcgzhZ+UmmD5thBrv8KL/CnYFROBuULDm/4gy7dIBYdv8obRT1Uqw="
 
 addons:
   apt:
@@ -56,23 +29,13 @@ addons:
       - libxinerama-dev
       - libxrandr-dev
 
-      # For cross-compiling to Windows.
-      - binutils-mingw-w64-i686
-      - binutils-mingw-w64-x86-64
-      - gcc-mingw-w64-i686
-      - gcc-mingw-w64-x86-64
-      - g++-mingw-w64-i686
-      - g++-mingw-w64-x86-64
-      - mingw-w64
+  coverity_scan:
+    project:
+      name: "Marqin/godot"
+    notification_email: "$COVERITY_SCAN_NOTIFICATION_EMAIL"
+    build_command: "scons platform=x11 target=debug tools=yes"
+    branch_pattern: "coverity_scan"
 
-
-before_script:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; brew install scons; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$GODOT_TARGET" = "android" ]; then
-      brew update; brew install -v android-sdk;
-      brew install -v android-ndk | grep -v "inflating:" | grep -v "creating:";
-      export ANDROID_HOME=/usr/local/opt/android-sdk; export ANDROID_NDK_ROOT=/usr/local/opt/android-ndk;
-    fi
 
 script:
-  - scons platform=$GODOT_TARGET CXX=$CXX openssl=builtin
+  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then echo "Something went wrong..."; fi
