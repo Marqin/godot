@@ -60,6 +60,7 @@ before_script:
 
 script:
   - if [ "$ANALYZE" != "true" ]; then scons platform=$GODOT_TARGET CXX=$CXX; fi
+  - ls -lah bin/
   - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$ANALYZE" = "true" ]; then scan-build-3.5 scons platform=x11 tools=no CXX=/usr/share/clang/scan-build-3.5/c++-analyzer; fi
   # Beware, this is timeouting on free Travis CI. Uncomment if you use paid one.
   #- if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$ANALYZE" = "true" ]; then scan-build-3.7 scons platform=osx tools=no CXX="$(dirname $(which scan-build-3.7))/"$(dirname $(readlink $(which scan-build-3.7)))"/../share/clang-3.7/tools/scan-build/c++-analyzer"; fi
