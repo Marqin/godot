@@ -95,6 +95,17 @@ Error PacketPeerUDPPosix::put_packet(const uint8_t *p_buffer,int p_buffer_size){
 	errno = 0;
 	int err;
 
+  if (source_port > 0) {
+    struct sockaddr_in src_addr;
+    src_addr.sin_family = AF_INET;
+    src_addr.sin_addr.s_addr = INADDR_ANY;
+    src_addr.sin_port = htons(source_port);
+
+    if (bind(sock, (struct sockaddr *) &src_addr, sizeof(src_addr)) < 0) {
+      return FAILED;
+    }
+  }
+
 	while ( (err = sendto(sock, p_buffer, p_buffer_size, 0, (struct sockaddr*)&addr, sizeof(addr))) != p_buffer_size) {
 
 		if (errno != EAGAIN) {
@@ -201,6 +212,10 @@ void PacketPeerUDPPosix::set_send_address(const IP_Address& p_address,int p_port
 	peer_port=p_port;
 }
 
+void PacketPeerUDPPosix::set_source_port(int s_port) {
+	source_port=s_port;
+}
+
 PacketPeerUDP* PacketPeerUDPPosix::_create() {
 
 	return memnew(PacketPeerUDPPosix);
@@ -218,6 +233,7 @@ PacketPeerUDPPosix::PacketPeerUDPPosix() {
 	packet_port=0;
 	queue_count=0;
 	peer_port=0;
+  source_port=0;
 }
 
 PacketPeerUDPPosix::~PacketPeerUDPPosix() {

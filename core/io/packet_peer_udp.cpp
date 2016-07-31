@@ -68,7 +68,7 @@ void PacketPeerUDP::_bind_methods() {
 	ObjectTypeDB::bind_method(_MD("get_packet_address"),&PacketPeerUDP::_get_packet_address);
 	ObjectTypeDB::bind_method(_MD("get_packet_port"),&PacketPeerUDP::get_packet_port);
 	ObjectTypeDB::bind_method(_MD("set_send_address","host","port"),&PacketPeerUDP::_set_send_address);
-
+  ObjectTypeDB::bind_method(_MD("set_source_port","port"),&PacketPeerUDP::set_source_port);
 
 }
 

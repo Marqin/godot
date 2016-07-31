@@ -51,6 +51,7 @@ class PacketPeerUDPPosix : public PacketPeerUDP {
 
 	IP_Address peer_addr;
 	int peer_port;
+  int source_port;
 
 	_FORCE_INLINE_ int _get_socket();
 
@@ -74,6 +75,7 @@ public:
 	virtual int get_packet_port() const;
 
 	virtual void set_send_address(const IP_Address& p_address,int p_port);
+  virtual void set_source_port(int s_port);
 
 	static void make_default();
 

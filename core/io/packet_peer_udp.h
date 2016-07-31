@@ -54,7 +54,7 @@ public:
 	virtual IP_Address get_packet_address() const=0;
 	virtual int get_packet_port() const=0;
 	virtual void set_send_address(const IP_Address& p_address,int p_port)=0;
-
+  virtual void set_source_port(int s_port)=0;
 
 	static Ref<PacketPeerUDP> create_ref();
 	static PacketPeerUDP* create();
